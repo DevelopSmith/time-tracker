@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type='text/javascript'>
+      // In such way we connect ipcRenderer to our page.
+      window.ipcRenderer = require('electron').ipcRenderer;
+      // The ipcRenderer module provides a few methods so you can send events from the render process (web page) to the main process.
+    </script>
+  </head>
+
+  <!-- no-drag option makes our new window non-draggable -->
+  <body style='-webkit-app-region: no-drag'>
+    <button id='my-button'>X</button>
+    <button id='my-second-button'>Set rundom!</button>
+    <button id='notify'>Notify!</button>
+    <button id='about'>Open About</button>
+    <button id='main'>Open Main</button>
+
+    <script type='text/javascript'>
+     document.getElementById("my-button").addEventListener("click", function (e) {
+        ipcRenderer.send('quit-app');
+      });
+
+      var textArray = ['First', 'Second', 'Third'];
+
+      document.getElementById('my-second-button').addEventListener("click", function (e) {
+        var randomIndex = Math.floor(Math.random() * textArray.length);
+        var randomString = textArray[randomIndex];
+        // On click we send event to Main Process (Index.js file) with a random string.
+        ipcRenderer.send('update-title-tray-window-event', randomString);
+      });
+
+      document.getElementById("notify").addEventListener("click", function (e) {
+        // Electron conveniently allows developers to send notifications with the HTML5 Notification API, using the currently running operating system’s native notification APIs to display it.
+
+        let notif = new window.Notification( 'My First Notification', {
+          body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti, maxime explicabo dolores tenetur'
+        })
+
+        // Also, we should add event handler for it. So, when user clicks on the notification our About window will show up.
+        notif.onclick = function () {
+          window.ipcRenderer.send('show-about-window-event')
+        }
+      });
+
+      document.getElementById("about").addEventListener("click", function (e) {
+        ipcRenderer.send('show-about-window-event');
+      });
+
+      document.getElementById("main").addEventListener("click", function (e) {
+        ipcRenderer.send('show-main-window-event');
+      });
+
+  </script>
+
+  </body>
+</html>

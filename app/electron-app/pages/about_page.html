@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type='text/javascript'>
+      window.shell = require('electron').shell;
+
+      // Add remote module - because we will use main process modules from the renderer process.
+      window.remote = require('electron').remote;
+    </script>
+
+    <style type="text/css">
+      #header {
+        // Make only header is draggable
+        -webkit-user-select: none;
+        -webkit-app-region: drag;
+
+        background-color: blue;
+      }
+    </style>
+  </head>
+
+  <body style='-webkit-app-region: no-drag'>
+    <div id='header'>
+      <button id='close'>X</button>
+      <button id='hide'>-</button>
+      <button id='maximize'><></button>
+    </div>
+
+    <h1>ABOUT PAGE</h1>
+
+    <a id='open-external' href="https://github.com/DmytroVasin/">Open</button>
+
+    <script type='text/javascript'>
+      document.getElementById("open-external").addEventListener("click", function (e) {
+        e.preventDefault();
+        var remoteLink = this.getAttribute('href');
+        shell.openExternal( remoteLink );
+      });
+
+      document.getElementById("close").addEventListener("click", function (e) {
+        // We are trying to emulate native behavior, so we should hide the window (we should hide it in doc-bar too).
+        remote.app.dock.hide();
+        // getCurrentWindow - Returns the BrowserWindow object to which this web page belongs.
+        remote.getCurrentWindow().hide();
+      });
+
+      document.getElementById("hide").addEventListener("click", function (e) {
+        // Emulate minimize to tray effect.
+        remote.getCurrentWindow().minimize();
+      });
+
+      document.getElementById("maximize").addEventListener("click", function (e) {
+        // Emulate maximize-minimize effect
+        if (remote.getCurrentWindow().isMaximized()) {
+          remote.getCurrentWindow().unmaximize();
+        } else {
+          remote.getCurrentWindow().maximize();
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type='text/javascript'>
+			window.shell = require('electron').shell;
+
+			// Add remote module - because we will use main process modules from the renderer process.
+			window.remote = require('electron').remote;
+		</script>
+
+		<style type="text/css">
+				html, body {
+					background: rgba(0, 0, 0, 0);
+			}
+
+			#wrapper{
+				background: #fff;
+				margin-left: 100px;
+				border-radius: 6px 6px 20px 20px;
+				overflow: hidden;
+			}
+
+			#header {
+				// Make only header is draggable
+				-webkit-user-select: none;
+				-webkit-app-region: drag;
+
+				background-color: blue;
+				padding: 3px;
+				border-radius: 5px 5px 0 0;
+			}
+			#body{
+				padding: 10px;
+				text-align: center;
+				border-radius: 0 0 20px 20px;
+				min-height: 200px;
+			}
+
+			#circle{
+				width: 100px;
+				height: 100px;
+				/*border-radius: 100%;
+				background: red;
+				border: #fff 1px solid;*/
+				position: absolute;
+				top: 40px;
+				left: 0;
+			}
+			#circle img{
+				max-width: 100%;
+			}
+		</style>
+	</head>
+
+	<body style='-webkit-app-region: no-drag'>
+		<div id="wrapper">
+			<div id='header'>
+				<button id='close'>X</button>
+				<button id='hide'>-</button>
+				<button id='maximize'><></button>
+			</div>
+
+			<div id="body">
+				<h1>ABOUT PAGE</h1>
+
+				<a id='open-external' href="https://github.com/DmytroVasin/">Open</button>
+			</div>
+		</div>
+
+		<div id="circle">
+			<img src="../media/Portal_symbol.svg" />
+		</div>
+
+		<script type='text/javascript'>
+			document.getElementById("open-external").addEventListener("click", function (e) {
+				e.preventDefault();
+				var remoteLink = this.getAttribute('href');
+				shell.openExternal( remoteLink );
+			});
+
+			document.getElementById("close").addEventListener("click", function (e) {
+				// We are trying to emulate native behavior, so we should hide the window (we should hide it in doc-bar too).
+				remote.app.dock.hide();
+				// getCurrentWindow - Returns the BrowserWindow object to which this web page belongs.
+				remote.getCurrentWindow().hide();
+			});
+
+			document.getElementById("hide").addEventListener("click", function (e) {
+				// Emulate minimize to tray effect.
+				remote.getCurrentWindow().minimize();
+			});
+
+			document.getElementById("maximize").addEventListener("click", function (e) {
+				// Emulate maximize-minimize effect
+				if (remote.getCurrentWindow().isMaximized()) {
+					remote.getCurrentWindow().unmaximize();
+				} else {
+					remote.getCurrentWindow().maximize();
+				}
+			});
+		</script>
+	</body>
+</html>
